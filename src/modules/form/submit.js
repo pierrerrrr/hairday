@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { apiConfig, scheduleNew } from '../../services/schedule-new.js';
+import { schedulesDay } from "../schedule/load.js"
 
 const form = document.querySelector('form');
 const selectedDate = document.getElementById("date")
@@ -28,8 +29,8 @@ form.onsubmit = async (event) => {
         // aqui recupera somente a hora
         const [hour] = hourSelected.innerText.split(":");
 
-        // insere a data e hora
-        const when = dayjs(selectedDate.value).add(hour, "hour").format("DD-MM-YYYY - HH:mm");
+        // insere a data e hora no formato ISO
+        const when = dayjs(selectedDate.value).hour(hour).minute(0).format();
 
         const id = new Date().getTime();
 
@@ -38,6 +39,12 @@ form.onsubmit = async (event) => {
             name,
             when,
         })
+
+        // recarrega os horários disponíveis
+        await schedulesDay();
+
+        // limpa o campo do nome
+        clientName.value = "";
 
     } catch (error) {
         alert("Erro ao enviar o formulário. Tente novamente mais tarde.");
