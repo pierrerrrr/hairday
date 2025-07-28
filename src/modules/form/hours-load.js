@@ -5,17 +5,23 @@ import { hoursClick } from "./hours-click.js";
 
 const hours = document.getElementById("hours")
 
-export function hoursLoad({ date }) {
+export function hoursLoad({ date, dailySchedules }) {
+    // recupera a lista de todos os horários ocupados
+    const unavaiableHours = dailySchedules.map((schedule) => dayjs(schedule.when).format("HH:mm"));
+
     const opening = scheduleHours.map((hour) => {
         // recupera somente a hora do dia
         const [scheduleHour] = hour.split(":");
 
         // validação para ver se a hora está no passado
-        const isHourPast = dayjs(date).add(scheduleHour, "hour").isAfter(dayjs())
+        const isHourPast = dayjs(date).add(scheduleHour, "hour").isBefore(dayjs())
+
+        // verifica se a hora está disponível - sendo marcada ou que já passou do tempo
+        const available = !unavaiableHours.includes(hour) && !isHourPast;
 
         return {
             hour,
-            available: isHourPast,
+            available
         }
     })
 
@@ -24,10 +30,10 @@ export function hoursLoad({ date }) {
         const li = document.createElement("li");
         li.classList.add("hour");
         li.classList.add(available ? "hour-available" : "hour-unavailable");
-        
+
         li.textContent = hour;
 
-        if(hour === "09:00") {
+        if (hour === "09:00") {
             hourHeaderAdd("Manhã");
         } else if (hour === "13:00") {
             hourHeaderAdd("Tarde");
