@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { apiConfig, scheduleNew } from '../../services/schedule-new.js';
 
 const form = document.querySelector('form');
 const selectedDate = document.getElementById("date")
@@ -10,7 +11,7 @@ const setActualDate = dayjs(new Date()).format("YYYY-MM-DD");
 selectedDate.value = setActualDate;
 selectedDate.min = setActualDate;
 
-form.onsubmit = (event) => {
+form.onsubmit = async (event) => {
     event.preventDefault();
 
     try {
@@ -28,11 +29,11 @@ form.onsubmit = (event) => {
         const [hour] = hourSelected.innerText.split(":");
 
         // insere a data e hora
-        const when = dayjs(selectedDate.value).add(hour, "hour");
+        const when = dayjs(selectedDate.value).add(hour, "hour").format("DD-MM-YYYY - HH:mm");
 
         const id = new Date().getTime();
 
-        console.log({
+        await scheduleNew({
             id,
             name,
             when,
